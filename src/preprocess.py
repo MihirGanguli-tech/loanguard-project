@@ -15,7 +15,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
 
         #find columns with high missingness, above prop_missing_threshold, add to list to be dropped
         self.cols_to_drop = [col for col in X.columns if X[col].isna().mean() > self.prop_missing_threshold and col not in ['EXT_SOURCE_1', 'OWN_CAR_AGE']]
-        self.cols_to_drop.extend(['FLAG_OWN_CAR', 'WEEKDAY_APPR_PROCESS_START'])
+        self.cols_to_drop.extend(['FLAG_OWN_CAR', 'WEEKDAY_APPR_PROCESS_START', 'REGION_RATING_CLIENT', 'REG_REGION_NOT_WORK_REGION', 'REG_CITY_NOT_WORK_CITY'])
         return self
     
     def transform(self, X, y = None):
@@ -83,9 +83,25 @@ class FlagEngineer(BaseEstimator, TransformerMixin):
         
 
 class RatioEngineer(BaseEstimator, TransformerMixin):
-    pass
+    '''
+    Create credit to goods ratio column and annuity to income ratio column, engineered features to avoid collinearity. 
+    '''
+    
+    def fit (self, X, y = None):
+        return self
+    
+    def transform(self, X, y = None):
+        df = X.copy()
+
+        df['CREDIT_TO_GOODS_RATIO'] = df['AMT_CREDIT']/df['AMT_GOODS_PRICE']
+        df['ANNUITY_TO_INCOME_RATIO'] = df['AMT_ANNUITY']/df['AMT_INCOME_TOTAL']
+
+        df = df.drop(columns= ['AMT_GOODS_PRICE', 'AMT_ANNUITY'], errors= 'ignore')
+
+        return df
 
 class CategoryGrouper(BaseEstimator, TransformerMixin):
+
     pass
 
 def build_pipeline():

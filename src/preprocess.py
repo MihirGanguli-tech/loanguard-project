@@ -2,6 +2,28 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import pandas as pd
 
+
+class DropColumns(BaseEstimator, TransformerMixin):
+    '''
+    Drop columns with high proportion of missing values, as well as other columns that were decided to be dropped in EDA.
+    '''
+
+    def __init__(self, prop_missing_threshold):
+        self.prop_missing_threshold = prop_missing_threshold
+        
+    def fit(self, X, y = None):
+
+        #find columns with high missingness, above prop_missing_threshold, add to list to be dropped
+        self.cols_to_drop = [col for col in X.columns if X[col].isna().mean() > self.prop_missing_threshold and col not in ['EXT_SOURCE_1', 'OWN_CAR_AGE']]
+        self.cols_to_drop.extend(['FLAG_OWN_CAR', 'WEEKDAY_APPR_PROCESS_START'])
+        return self
+    
+    def transform(self, X, y = None):
+        df = X.copy()
+        df = df.drop(columns = self.cols_to_drop, errors = 'ignore')
+
+        return df
+
 class DaysEmployedFixer(BaseEstimator, TransformerMixin):
     '''Replace anomaly value 365243 (representing unemployment/retirement) with nan'''
     

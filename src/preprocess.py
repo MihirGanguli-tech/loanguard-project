@@ -1,4 +1,8 @@
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import pandas as pd
 
@@ -8,7 +12,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
     Drop columns with high proportion of missing values, as well as other columns that were decided to be dropped in EDA.
     '''
 
-    def __init__(self, prop_missing_threshold):
+    def __init__(self, prop_missing_threshold = 0.474):
         self.prop_missing_threshold = prop_missing_threshold
         
     def fit(self, X, y = None):
@@ -100,10 +104,65 @@ class RatioEngineer(BaseEstimator, TransformerMixin):
 
         return df
 
-class CategoryGrouper(BaseEstimator, TransformerMixin):
-
-    pass
-
-def build_pipeline():
+class RareCategoryGrouper(BaseEstimator, TransformerMixin):
+    '''Group infrequent categories into "Other"
+    learns rare categories from training data only to prevent leakage.
+    '''
     
-    pass
+    def __init__(self, cols, threshold=0.03):
+        #threshold for value to be considered rare category
+        self.cols = cols
+        self.threshold = threshold
+    
+    def fit(self, X, y=None):
+        self.rare_categories_ = {}
+        
+        for col in self.cols:
+            # calculate frequency of each category
+            freq = X[col].value_counts(normalize=True)
+            # store categories below threshold
+            self.rare_categories_[col] = list(freq[freq < self.threshold].index)
+        
+        return self
+    
+    def transform(self, X, y=None):
+        df = X.copy()
+        
+        for col in self.cols:
+            # replace rare categories with 'Other'
+            df[col] = df[col].apply(
+                lambda x: 'Other' if x in self.rare_categories_[col] else x
+            )
+        
+        return df
+    
+def build_pipeline(num_cols, cat_cols):
+    
+    #median imputation as many columns are skewed right
+    num_pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy='median'))
+    ])
+    
+    # categorical pipeline - mode imputation and then one hot encoding
+    cat_pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy='most_frequent')),
+        ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+    ])
+    
+    # apply num and cat tranformations for respective columns
+    col_transformer = ColumnTransformer([
+        ('num', num_pipeline, num_cols),
+        ('cat', cat_pipeline, cat_cols)
+    ])
+    
+    pipeline = Pipeline([
+        ('drop_columns', DropColumns()),
+        ('days_employed_fixer', DaysEmployedFixer()),
+        ('flag_engineer', FlagEngineer()),
+        ('days_transformer', DaysColumnsTransformer()),
+        ('ratio_engineer', RatioEngineer()),
+        ('rare_category_grouper', RareCategoryGrouper(cols=['OCCUPATION_TYPE', 'ORGANIZATION_TYPE'])),
+        ('col_transformer', col_transformer)
+    ])
+    
+    return pipeline

@@ -64,7 +64,23 @@ class DaysColumnsTransformer(BaseEstimator, TransformerMixin):
         return df
 
 class FlagEngineer(BaseEstimator, TransformerMixin):
-    pass
+    '''Create flag for missing/not missing for columns where missingness itself is an indicator, 
+    and cannot be imputed without adding extra assumptions.
+    '''
+    def fit(self, X, y = None):
+        return self
+    
+    def transform(self, X, y = None):
+        df = X.copy()
+
+        df['EXT_SOURCE_1_MISSING_FLAG'] = df['EXT_SOURCE_1'].isna().astype(int)
+        df['EXT_SOURCE_3_MISSING_FLAG'] = df['EXT_SOURCE_3'].isna().astype(int)
+        df['DAYS_EMPLOYED_MISSING_FLAG'] = df['DAYS_EMPLOYED'].isna().astype(int)
+        
+        return df
+
+
+        
 
 class RatioEngineer(BaseEstimator, TransformerMixin):
     pass

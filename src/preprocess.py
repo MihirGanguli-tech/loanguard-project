@@ -136,7 +136,7 @@ class RareCategoryGrouper(BaseEstimator, TransformerMixin):
         
         return df
     
-def build_pipeline(num_cols, cat_cols, scale_features = False):
+def build_pipeline(num_cols, cat_cols, model, scale_features = False):
     
     #median imputation as many columns are skewed right, scaling included if necessary for model
     if scale_features == True:

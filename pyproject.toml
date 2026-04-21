@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loanguard"
+version = "0.1.0"
+description = "Credit default prediction pipeline"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "app*"]

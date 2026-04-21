@@ -2,7 +2,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import numpy as np
 import pandas as pd
 
@@ -136,12 +136,16 @@ class RareCategoryGrouper(BaseEstimator, TransformerMixin):
         
         return df
     
-def build_pipeline(num_cols, cat_cols):
+def build_pipeline(num_cols, cat_cols, scale_features = False):
     
-    #median imputation as many columns are skewed right
-    num_pipeline = Pipeline([
-        ('imputer', SimpleImputer(strategy='median'))
-    ])
+    #median imputation as many columns are skewed right, scaling included if necessary for model
+    if scale_features == True:
+        num_pipeline = Pipeline([
+            ('imputer', SimpleImputer(strategy='median')),
+            ('scaler', StandardScaler())])
+    else:
+        num_pipeline = Pipeline([
+            ('imputer', SimpleImputer(strategy='median'))])
     
     # categorical pipeline - mode imputation and then one hot encoding
     cat_pipeline = Pipeline([

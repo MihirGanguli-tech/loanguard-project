@@ -44,7 +44,7 @@ pipeline.fit(X_train, y_train)
 y_val_pred = pipeline.predict(X_val)
 
 y_val_proba = pipeline.predict_proba(X_val)[:,1]
-print(f"ROC-AUC: {roc_auc_score(y_val, y_val_proba):.4f}")
+print(f"ROC-AUC for Logistic Regression: {roc_auc_score(y_val, y_val_proba):.4f}")
 
 
 print(classification_report(y_val, y_val_pred))
@@ -53,6 +53,33 @@ print(classification_report(y_val, y_val_pred))
 print("reached save section")
 joblib.dump(pipeline, 'models/baseline_logistic_regression.joblib')
 print("pipeline saved")
+joblib.dump(X_test, 'data/processed/X_test.joblib')
+joblib.dump(y_test, 'data/processed/y_test.joblib')
+print("test splits saved")
+
+rf_pipeline = build_pipeline(num_cols, cat_cols, 
+                             RandomForestClassifier(class_weight='balanced',
+                                                     max_depth = 20, #prevent overfitting from trees being too deep
+                                                     min_samples_leaf=50,
+                                                     n_jobs = -1) #using all cpu cores to speed up training
+                            )
+
+
+rf_pipeline.fit(X_train, y_train)
+
+
+y_val_pred = rf_pipeline.predict(X_val)
+
+y_val_proba = rf_pipeline.predict_proba(X_val)[:,1]
+print(f"ROC-AUC for Random Forest: {roc_auc_score(y_val, y_val_proba):.4f}")
+
+
+print(classification_report(y_val, y_val_pred))
+
+
+print("reached save section")
+joblib.dump(rf_pipeline, 'models/baseline_random_forest.joblib')
+print(" random forest pipeline saved")
 joblib.dump(X_test, 'data/processed/X_test.joblib')
 joblib.dump(y_test, 'data/processed/y_test.joblib')
 print("test splits saved")

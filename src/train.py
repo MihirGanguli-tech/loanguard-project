@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from src.preprocess import build_pipeline, DropColumns, DaysEmployedFixer, DaysColumnsTransformer, FlagEngineer, RatioEngineer, RareCategoryGrouper
 from sklearn.pipeline import Pipeline
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMClassifier
@@ -93,3 +94,44 @@ for model_name, model in models.items():
 print("\n=== Model Comparison (ROC-AUC) ===")
 for model_name, roc_auc in sorted(results.items(), key=lambda x: x[1], reverse=True):
     print(f"{model_name}: {roc_auc:.4f}")
+
+#param dist for randomized search
+param_dist = {
+    'model__n_estimators': [100, 300, 500],
+    'model__max_depth': [3, 5, 7],        
+    'model__learning_rate': [0.01, 0.05, 0.1],
+    'model__num_leaves': [31, 63, 127],
+    'model__min_child_samples': [20, 50, 100]
+}
+
+lgbm_pipeline = build_pipeline(
+    num_cols, 
+    cat_cols, 
+    LGBMClassifier(class_weight='balanced', random_state=23, n_jobs=-1),
+    scale_features=False
+)
+
+search = RandomizedSearchCV(
+    lgbm_pipeline,
+    param_distributions=param_dist,
+    n_iter=20,              # try 20 random combinations
+    scoring='roc_auc',      # optimize for ROC-AUC
+    cv=3,                   # 3 fold cross validation
+    random_state=23,
+    n_jobs=-1,              # use all available cpu cores
+    verbose=2               # prints progress
+)
+
+search.fit(X_train, y_train)
+
+print(f"Best params: {search.best_params_}")
+print(f"Best CV ROC-AUC: {search.best_score_:.4f}")
+
+# evaluate best model on validation set
+y_val_pred = search.predict(X_val)
+y_val_proba = search.predict_proba(X_val)[:, 1]
+print(f"Validation ROC-AUC: {roc_auc_score(y_val, y_val_proba):.4f}")
+print(classification_report(y_val, y_val_pred))
+
+# save best pipeline
+joblib.dump(search.best_estimator_, 'models/lightgbm_tuned.joblib')

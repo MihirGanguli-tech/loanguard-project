@@ -22,6 +22,7 @@ EDA was originally done for a class project, expanded as a personal project and 
 ---
 
 ## Project Structure
+```
 loanguard-project/
 ├── app/
 │   ├── main.py          # FastAPI app and endpoints
@@ -44,6 +45,7 @@ loanguard-project/
 ├── Dockerfile
 ├── pyproject.toml
 └── requirements.txt
+```
 
 ---
 

@@ -1,5 +1,7 @@
 # LoanGuard — Credit Default Prediction
 
+**[Live API →](http://loanguard-env.eba-vmmptjpn.us-east-1.elasticbeanstalk.com/docs)**
+
 An end to end machine learning project that predicts the likelihood of a loan applicant defaulting, built on the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset from Kaggle.
 
 The project covers the full ML workflow: Exploratory Data Analysis, feature engineering, preprocessing pipeline, model training and evaluation, and a REST API for serving predictions.

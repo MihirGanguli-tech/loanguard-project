@@ -2,7 +2,7 @@
 
 An end to end machine learning project that predicts the likelihood of a loan applicant defaulting, built on the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset from Kaggle.
 
-The project covers the full ML workflow: exploratory data analysis, feature engineering, preprocessing pipeline, model training and evaluation, and a REST API for serving predictions.
+The project covers the full ML workflow: Exploratory Data Analysis, feature engineering, preprocessing pipeline, model training and evaluation, and a REST API for serving predictions.
 
 EDA was originally done for a class project, expanded as a personal project and resume builder.
 

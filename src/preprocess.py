@@ -1,3 +1,5 @@
+import os
+import joblib
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -6,6 +8,10 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import numpy as np
 import pandas as pd
 
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+model = joblib.load(os.path.join(BASE_DIR, "models", "lightgbm.joblib"))
 
 class DropColumns(BaseEstimator, TransformerMixin):
     '''

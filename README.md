@@ -24,7 +24,7 @@ EDA was originally done for a class project, expanded as a personal project and 
 - **FastAPI** — REST API
 - **Uvicorn** — ASGI server
 - **Joblib** — model serialization
-- **Docker** — containerization
+
 
 ---
 

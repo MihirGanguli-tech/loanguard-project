@@ -19,7 +19,7 @@ class DropColumns(BaseEstimator, TransformerMixin):
 
         #find columns with high missingness, above prop_missing_threshold, add to list to be dropped
         self.cols_to_drop = [col for col in X.columns if X[col].isna().mean() > self.prop_missing_threshold and col not in ['EXT_SOURCE_1', 'OWN_CAR_AGE']]
-        self.cols_to_drop.extend(['FLAG_OWN_CAR', 'WEEKDAY_APPR_PROCESS_START', 'REGION_RATING_CLIENT', 'REG_REGION_NOT_WORK_REGION', 'REG_CITY_NOT_WORK_CITY'])
+        self.cols_to_drop.extend(['FLAG_OWN_CAR', 'WEEKDAY_APPR_PROCESS_START', 'REGION_RATING_CLIENT', 'REG_REGION_NOT_WORK_REGION', 'REG_CITY_NOT_WORK_CITY', 'SK_ID_CURR'])
         return self
     
     def transform(self, X, y = None):
@@ -57,12 +57,12 @@ class DaysColumnsTransformer(BaseEstimator, TransformerMixin):
     def transform(self, X, y = None):
 
         df = X.copy()
-        #convert to days since birth age in years, easier to interpret
-        df['AGE_YEARS'] = (-df['DAYS_BIRTH'] / 365).astype(int)
+    
+        df['AGE_YEARS'] = (-pd.to_numeric(df['DAYS_BIRTH'], errors='coerce') / 365)
 
-        days_cols = [col for col in df.columns if col.startswith('DAYS')]
+        days_cols = [col for col in df.columns if col.startswith('DAYS') and col != 'DAYS_BIRTH']
         for col in days_cols:
-            df[col] = -df[col]
+            df[col] = -pd.to_numeric(df[col], errors='coerce')
 
         df = df.drop(columns='DAYS_BIRTH', errors='ignore')
         return df
@@ -166,7 +166,8 @@ def build_pipeline(num_cols, cat_cols, model, scale_features = False):
         ('days_transformer', DaysColumnsTransformer()),
         ('ratio_engineer', RatioEngineer()),
         ('rare_category_grouper', RareCategoryGrouper(cols=['OCCUPATION_TYPE', 'ORGANIZATION_TYPE'])),
-        ('col_transformer', col_transformer)
+        ('col_transformer', col_transformer),
+        ('model', model)
     ])
     
     return pipeline

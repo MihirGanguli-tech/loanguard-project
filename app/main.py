@@ -20,3 +20,7 @@ def predict_default(application: LoanApplication):
     default probability, and risk level.
     """
     return predict(application)
+
+@app.get("/")
+def root():
+    return {"message": "LoanGuard API is running"}

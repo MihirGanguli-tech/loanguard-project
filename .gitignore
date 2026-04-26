@@ -208,3 +208,4 @@ __marimo__/
 #don't push dataset to repo
 data/raw/
 data/processed/
+!models/lightgbm.joblib

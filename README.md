@@ -156,6 +156,7 @@ Open `http://127.0.0.1:8000/docs` in your browser.
 
 - Log transform for skewed numerical features before scaling for linear models
 - pytorch neural network model (most likely would not outperform lightGBM anyway, due to high proportion of missing values and mixed data types)
+- containerize with Docker
 - Streamlit frontend
 - CI/CD pipeline with GitHub Actions
 

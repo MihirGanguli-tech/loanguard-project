@@ -2,11 +2,14 @@
 
 **[Live API →](http://loanguard-env.eba-vmmptjpn.us-east-1.elasticbeanstalk.com/docs)**
 
--Test cases in tests/sample_requests.json
+
 
 An end to end machine learning project that predicts the likelihood of a loan applicant defaulting, built on the [Home Credit Default Risk](https://www.kaggle.com/c/home-credit-default-risk) dataset from Kaggle.
 
 The project covers the full ML workflow: Exploratory Data Analysis, feature engineering, preprocessing pipeline, model training and evaluation, and a REST API for serving predictions.
+
+## Sample Requests
+Three sample JSON payloads (low, medium, and high risk applicants) are available in [`tests/sample_requests.json`](tests/sample_requests.json) for testing the live API.
 
 EDA was originally done for a class project, expanded as a personal project and resume builder.
 

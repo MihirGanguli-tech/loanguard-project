@@ -165,5 +165,6 @@ Open `http://127.0.0.1:8000/docs` in your browser.
 - pytorch neural network model (most likely would not outperform lightGBM anyway, due to high proportion of missing values and mixed data types)
 - containerize with Docker
 - Streamlit frontend
+- make sure that values entered into the API match a certain format.
 - CI/CD pipeline with GitHub Actions
 

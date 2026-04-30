@@ -49,7 +49,7 @@ loanguard-project/
 │   └── evaluate.py      # Final test set evaluation
 ├── tests/
 │   └── test_api.py      # API endpoint tests
-├── Dockerfile
+├── Procfile
 ├── pyproject.toml
 └── requirements.txt
 ```

@@ -108,13 +108,13 @@ LightGBM Model
 
 ## Why I chose Lambda + API Gateway over EC2
 
-The project was initially deployed on AWS Elastic Beanstalk, but was draining my free credits at around $8 per month. For the production deployment linked in this repository, I chose **AWS Lambda + API Gateway** instead because it better fits a low-traffic ML inference API.
+The project was initially deployed on AWS Elastic Beanstalk, but was draining my free credits at around $8 per month. For the production deployment linked in this repository, I chose **AWS Lambda + API Gateway** instead, better fit for a portfolio project.
 
-- **Near $0/month hosting:** Unlike an EC2 instance, which incurs charges while running (~$7–8/month for a `t3.micro`), Lambda's permanent free tier means this API operates at  **$0/month** since the project is only deployed as a portfolio project.
+- **Near $0/month hosting:** Unlike an EC2 instance, which incurs charges while running (~$7–8/month for a `t3.micro`), Lambda's permanent free tier means this API operates at  $0/month since the project is only deployed as a portfolio project.
 
-- **Zero server maintenance:** 
+- **Serverless:** No need to provision or manage servers
 
-- **Scale-to-zero:** The API incurs no compute cost when idle because the billing is based on usage (requests and compute time).  API Gateway throttling set to 5 requests per second in the very unlikely event that there is abuse or extreme traffic spikes.
+- **Pay per request:** The API incurs no compute cost when idle because the billing is based on usage (requests and compute time).  API Gateway throttling set to 5 requests per second in the very unlikely event that there is abuse or extreme traffic spikes.
 ---
 
 ## Challenges 

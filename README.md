@@ -1,6 +1,6 @@
 # LoanGuard — Credit Default Prediction
 
-**[Live API →](http://loanguard-env.eba-vmmptjpn.us-east-1.elasticbeanstalk.com/docs)**
+**[Live API →](https://whawj3m6rd.execute-api.us-east-1.amazonaws.com/docs#/default/predict_default_predict_post)**
 
 
 
@@ -86,41 +86,54 @@ Built as a custom sklearn pipeline with the following steps:
 
 ---
 
-## How to Run
+## Architecture
 
-**1. Clone the repo**
-```bash
-git clone https://github.com/yourusername/loanguard-project.git
-cd loanguard-project
+The trained LightGBM model is served through a FastAPI application, containerized with Docker, and deployed as an AWS Lambda container behind an API Gateway HTTP API, which  provides a fully serverless endpoint.
+
+```text
+Client
+   │
+   ▼
+API Gateway (HTTP API)
+   │
+   ▼
+AWS Lambda (Docker Container)
+   │
+   ▼
+FastAPI (via Mangum)
+   │
+   ▼
+LightGBM Model
 ```
 
-**2. Create and activate a conda environment**
-```bash
-conda create -n loanguard python=3.10
-conda activate loanguard
-```
+## Why I chose Lambda + API Gateway over EC2
 
-**3. Install dependencies**
-```bash
-pip install -e .
-pip install -r requirements.txt
-```
+The project was initially deployed on AWS Elastic Beanstalk, but was draining my free credits at around $8 per month. For the production deployment linked in this repository, I chose **AWS Lambda + API Gateway** instead because it better fits a low-traffic ML inference API.
 
-**4. Add the dataset**  
-Download `application_train.csv` from [Kaggle](https://www.kaggle.com/c/home-credit-default-risk/data) and place it in `data/raw/`.
+- **Near $0/month hosting:** Unlike an EC2 instance, which incurs charges while running (~$7–8/month for a `t3.micro`), Lambda's permanent free tier means this API operates at  **$0/month** since the project is only deployed as a portfolio project.
 
-**5. Train the model**
-```bash
-python -m src.train
-```
+- **Zero server maintenance:** 
 
-**6. Run the API**
-```bash
-uvicorn app.main:app --reload
-```
+- **Scale-to-zero:** The API incurs no compute cost when idle because the billing is based on usage (requests and compute time).  API Gateway throttling set to 5 requests per second in the very unlikely event that there is abuse or extreme traffic spikes.
+---
 
-**7. Visit the interactive docs**  
-Open `http://127.0.0.1:8000/docs` in your browser.
+## Challenges 
+
+- Package size exceeded Lambda's 250MB limit
+
+Initially tried to upload a zip file through the console and then through s3 when the zip file exceeded the 50 mb limit. Some required dependencies were also missing from the initial requirements file, I had created a new requirements file so that unnecessary packages were not added. Once all dependencies were added, the unzipped package exceeded Lambda's 250MB limit.
+
+ Solution: Migrated to a Docker container image deployment which has a limit of 10 GB using AWS's official public.ecr.aws/lambda/python:3.10 base image.
+
+- Model file not found at runtime despite being present in the image
+
+Throughout the process I was looking at Cloudwatch logs to identify any errors.  Even after confirming the model file was correctly copied into the container at build time, the Lambda function threw FileNotFoundError on a relative path (models/lightgbm.joblib).
+
+ Solution: Lambda's execution environment doesn't guarantee the working directory matches the code's location. Resolved by loading the model using an absolute path derived from the module's own file location (os.path.dirname(os.path.abspath(__file__))), matching the pattern already used in the preprocess.py.
+
+
+
+
 
 ---
 
@@ -159,12 +172,9 @@ Open `http://127.0.0.1:8000/docs` in your browser.
 
 ---
 
-## Future Improvements
+## Possible Future Improvements
 
 - Log transform for skewed numerical features before scaling for linear models
 - pytorch neural network model (most likely would not outperform lightGBM anyway, due to high proportion of missing values and mixed data types)
-- containerize with Docker
-- Streamlit frontend
 - Error handling to ensure that data entered for the predictions is in the correct format, with correct type of values.
-- CI/CD pipeline with GitHub Actions
 

@@ -1,9 +1,10 @@
 import joblib
 import pandas as pd
 from app.schemas import LoanApplication, PredictionResponse
-
+import os
 #load pretrained model
-model = joblib.load("models/lightgbm.joblib")
+model_path = os.path.join(os.environ.get("LAMBDA_TASK_ROOT", "."), "models", "lightgbm.joblib")
+model = joblib.load(model_path)
 
 def predict(application: LoanApplication):
     '''

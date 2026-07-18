@@ -67,7 +67,7 @@ Target variable is heavily imbalanced (~92% non-default, 8% default). Models eva
 | Random Forest | 0.749 | 0.56 |
 
 **Final model:** LightGBM with default parameters  
-**Test set ROC-AUC:** 0.743
+**Test set ROC-AUC:** 0.753
 
 ---
 

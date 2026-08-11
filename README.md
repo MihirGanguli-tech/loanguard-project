@@ -115,6 +115,8 @@ The project was initially deployed on AWS Elastic Beanstalk, but was draining my
 - **Serverless:** No need to provision or manage servers
 
 - **Pay per request:** The API incurs no compute cost when idle because the billing is based on usage (requests and compute time).  API Gateway throttling set to 5 requests per second in the very unlikely event that there is abuse or extreme traffic spikes.
+
+- **Tradeoff:** Infrequent traffic means cold starts, since no execution environment is kept running between requests. Because the container is also heavy (pandas, scikit-learn, LightGBM), the first request's latency is much higher than any following warm requests. This could be mitigated with Provisioned Concurrency, which keeps an instance warm at all times, but at additional ongoing cost.
 ---
 
 ## Challenges 
